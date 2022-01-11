@@ -17,9 +17,31 @@
 
 ## Overview
 
-An [R](https://www.r-project.org) package of XXXXXXXXXX.
+`syntCF`is an [R](https://www.r-project.org) package that provides a set of tools to estimate the effect of a program or a policy using a robust time series synthetic counterfactual approach coupled with the double difference estimator within a Machine Learning framework. The package is inspired by the methods proposed in following contributions:
+
+
+- [ ] [Grange, S. K., Carslaw, D. C., Lewis, A. C., Boleti, E., & Hueglin, C. (2018)](https://acp.copernicus.org/articles/18/6223/2018/)
+- [ ] [Petetin, H., Bowdalo, D., Soret, A., Guevara, M., Jorba, O., Serradell, K., & Pérez García-Pando, C. (2020)](https://acp.copernicus.org/articles/20/11119/2020/#abstract)
+- [ ] [Granella F., Reis L. A., Bosetti V. & Tavoni M. (2020)](https://iopscience.iop.org/article/10.1088/1748-9326/abd3d2)
+- [ ] [Hammad, A. T., Falchetta, G., & Wirawan, I. B. M. (2021)](https://iopscience.iop.org/article/10.1088/2515-7620/abffa4)
+
+The library encapsulates different ML algorithms, favoring quantile models to account for uncertainty in the predicted counterfactual time seires.
+Classic ML metrics such as RMSE,MAPE and R2, are acompagnied with additional metrics specifically designed to evaluate the goodness of the prediction intervals based on the work of [Gneiting, T., & Raftery, A. E. (2007)](https://viterbi-web.usc.edu/~shaddin/cs699fa17/docs/GR07.pdf).
+
+The final effect estimation is based on a difference-in-difference (DID) to account for any systematic error in the chosen model.
+
+The library is built around `Caret` and `CaretEsamble` to provide the user with a wide variety of algorithms and speeding up training time. 
 
 ## Features
+**Training & Testing**
+
+**Estimation**
+
+**Stacking**
+
+**Plotting**
+
+For a worked example please refer to the R package documentation where you will find examples and method reference.
 ## Installation
 
 You can install `syntCF` from CRAN:

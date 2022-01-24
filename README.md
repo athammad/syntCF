@@ -67,8 +67,9 @@ remotes::install_github("athammad/syntCF")
 
 ## Vignettes
 
-After installing the package you can view vignettes by typing `browseVignettes("syntCF")` in your R session. Or you can check this [document](https://github.com/athammad/syntCF/doc/syntCF_vignette.html) where you will find an example with simulated data and method references.
-
+After installing the package you can view vignettes by typing `browseVignettes("syntCF")` in your R session. 
+<!--  Or you can check this [document](https://github.com/athammad/syntCF/doc/syntCF_vignette.html) where you will find an example with simulated data and method references.
+ -->
 
 ## Getting Help or Reporting an Issue
 

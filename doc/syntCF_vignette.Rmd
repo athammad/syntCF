@@ -1,0 +1,142 @@
+---
+title: "syntCF Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{syntCF_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+the `syntCF` package provides a set of tools to estimate the effect of a program or a policy using a robust synthetic counterfactual approach. This vignette is designed to give a quick introduction to the methodological background and an hands-on tutorial. For a more in depth discussion, the interested reader is referred to the `References` section.
+
+## Background
+
+The idea is to combine the well known double difference estimator from the econometric toolkit for program and policy evaluation and a Machine Learning (ML) framework to estimate the effect of a program or policy over time as the difference between the factual or observed time series and a synthetic counterfactual time series. By doing so, we try to answer the question: "what would have happened if a given program or policy had never took place?"
+
+The steps that we are going to take can be summarized as follow:
+
+- Train a ML model to capture the relations between a set of features and the outcome of interest in a period before the beginning of the program or policy. 
+
+- Use the trained model to predict the outcome given the covarites during the program or policy period. The predicted time series can be thought of as a counterfactual or business-as-usual scenario and compared with the observed (factual) one.
+
+The comparison, though cannot be done straightforward. The prediction will have inherently an error that we need to account for. To do so we use a difference-in-differences strategy from the econometrics toolkit for program and policy evaluation.
+
+After model training and testing to generate the synthetic projection, we estimate the effect of the program as the difference between the synthetically estimated time series and the actual data ($ΔObserved,Counterfactual$) before and after the program. More specifically, we subtract our prediction to the observed value of the outcome and we estimate the difference-in-differences linear regression using ordinary least squares (OLS) as in the following equation:
+
+$ΔObserved,Counterfactual =y-p=\alpha+ X\beta T + \epsilon$
+
+
+where $y$ is outcome of interest , $ρ$ is the value predicted by the ML model, and $T$ is a dummy equal to 1 during the program or policy and 0 prior to it.
+
+Finally, an important aspect to consider is that the identification strategy assumes that the covariates used throughout the aforementioned steps, are not themselves affected by the program or policy of interest and that the underlying relationships between them remain unchanged over time.
+<!-- Hence the identification strategy is based on the difference between the prediction error before and during the treatment period. -->
+
+## Usage
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+First we load the library. Automatically several other packages are loaded such as `data.table` and `caret`.
+```{r setup,eval=FALSE}
+library(SyntCF)
+
+```
+
+
+
+Second, we generate some simulated data. 10 years of daily observations.
+```{r,eval=FALSE}
+set.seed(1)
+tsn=365*10
+x1 <- as.numeric(tsn + arima.sim(model = list(ar = 0.999), n = tsn))
+x2 <- as.numeric(tsn + arima.sim(model = list(ar = 0.98), n = tsn))
+x3 <- as.numeric(tsn + arima.sim(model = list(ar = 0.97), n = tsn))
+x4 <- as.numeric(tsn + arima.sim(model = list(ar = 0.96), n = tsn))
+y <- as.numeric(1.2 * x1 + x2 +  x3 +  x4 +  rnorm(tsn))
+y <- as.numeric(1.2 * x1 + rnorm(tsn))
+
+```
+
+We increase the value of Y by + 5 points during what we will define as the treatment period.
+
+```{r,eval=FALSE}
+y[(365*9):(365*10)] <- y[(365*9):(365*10)] + 5
+Dates <- seq.Date(as.Date("2014-01-01"), by = 1, length.out = tsn)
+data <-cbind.data.frame(Dates,y, x1,x2,x3,x4)
+setDT(data)
+data[Dates%between%c("2014-01-01", "2022-12-28"),treatment:=0]
+data[Dates%between%c("2022-12-29", "2023-12-29"),treatment:=1]
+```
+
+Let's give a quick look at our dataset.
+```{r,eval=FALSE}
+plot.ts(data)
+```
+
+To enhance the accuracy of the model and to account for trends and seasonality, it is usually advised to generate several lagged features for each predictor and calculate their average values across time (e.g. mean temperature and humidity for each month). Selecting and transforming variables is based on domain knowledge and on the data at hands. Here we will limit ours self to use the variables as they are and use a small value for `tuneLength`.
+
+```{r,eval=FALSE}
+
+ trainModel<-syntCFtrain(frm = y~x1+x2+x3+x4,
+                        data=data,
+                        p.var=data$treatment,
+                        Dates=data$Dates,
+                        p.start="2022-12-29",
+                        p.end="2023-12-29",
+                        testingPeriod=365,
+                        tuneLength=3)
+
+
+#Time ellapsed
+trainModel$Model$times$everything
+```
+
+Note that you can customized how the training process using any of the argument allowed in `train` and `trainControl` as defined in `caret`.
+
+
+Compute evaluation metrics to measure regression performance.
+
+Alongside the classic evaluation metrics (RMSPE, MAPE,R2), the library incorporates a more sophisticated measure of performance of a distribution prediction that comes from the family of scoring rules. Briefly, a scoring rule function $S(F, Y)$ is a measure of accuracy of a distribution prediction $F$ given the observed outcome $Y$. here we use a proper scoring rule designed to score quantile predictions from the package `scoringutils`.
+
+$S = (u - l) + 2/\alpha * (l - Y) * 1(Y < l) + 2/\alpha * (Y - u) * 1(Y > u)$
+
+Where $Y$ is the true value of the outcome of interest, $l$ and $u$ denotes respectively the lower and the upper quantiles of the range defined by the value of $\alpha$.
+
+```{r, eval=FALSE}
+ modelEval<-syntCFmetrics(trainModel,quantiles=c(0.1, 0.9))
+ modelEval$trainr$trainMetrics
+ modelEval$testr$testMetrics
+ modelEval$quants$intervalMetrics
+ 
+```
+Finally estimate the effect of the treatment and plot the results.
+
+
+```{r, eval=FALSE}
+
+estEffect<-syntCFest(modelEval)
+
+estEffect$Estimates
+
+```
+
+```{r, eval=FALSE}
+#plot
+syntCFplot(estEffect)
+```
+
+
+## References
+
+- [Grange, S. K., Carslaw, D. C., Lewis, A. C., Boleti, E., & Hueglin, C. (2018). Random forest meteorological normalisation models for Swiss PM 10 trend analysis. Atmospheric Chemistry and Physics, 18(9), 6223-6239.](https://acp.copernicus.org/articles/18/6223/2018/)
+- [Petetin, H., Bowdalo, D., Soret, A., Guevara, M., Jorba, O., Serradell, K., & Pérez García-Pando, C. (2020). Meteorology-normalized impact of the COVID-19 lockdown upon NO 2 pollution in Spain. Atmospheric Chemistry and Physics, 20(18), 11119-11141.](https://acp.copernicus.org/articles/20/11119/2020/#abstract)
+- [Granella, F., Reis, L. A., Bosetti, V., & Tavoni, M. (2021). COVID-19 lockdown only partially alleviates health impacts of air pollution in Northern Italy. Environmental Research Letters, 16(3), 035012.](https://iopscience.iop.org/article/10.1088/1748-9326/abd3d2)
+- [Hammad, A. T., Falchetta, G., & Wirawan, I. B. M. (2021). Back to the fields? Increased agricultural land greenness after a COVID-19 lockdown. Environmental Research Communications, 3(5), 051007.](https://iopscience.iop.org/article/10.1088/2515-7620/abffa4)
+- [Wright, M. N. & Ziegler, A. (2017) ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Software 77:1-17.](https://doi.org/10.18637/jss.v077.i01)
+- [Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American statistical Association, 102(477), 359-378.](https://viterbi-web.usc.edu/~shaddin/cs699fa17/docs/GR07.pdf)
+
+
+
+

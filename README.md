@@ -3,13 +3,13 @@
 # syntCF  <img src="logoSCF.png" width="400"  align="right"/>
 
 
-### Version BETA
+### Version 0.0.0.9000
 
 
 <!-- badges: start -->
 [![img](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/8b2ebdc9756819625a56f7a426c29f99b777ab1d/doc/state-badges.md)
 [![License](https://img.shields.io/badge/License-GPL%303.0-blue.svg)](https://opensource.org/licenses/GPL-3.0)
-[![R build status](https://github.com/bcgov/bcmaps/workflows/R-CMD-check/badge.svg)](https://github.com/bcgov/bcmaps/actions)
+<!--[![R build status](https://github.com/bcgov/bcmaps/workflows/R-CMD-check/badge.svg)](https://github.com/bcgov/bcmaps/actions)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/bcmaps)](https://cran.r-project.org/package=bcmaps) [![CRAN Downloads](https://cranlogs.r-pkg.org/badges/bcmaps?color=brightgreen)](https://CRAN.R-project.org/package=bcmaps) 
 <!-- badges: end -->
 
@@ -51,11 +51,13 @@ Estimate the effect of the treatment with `syntCFest()` using difference-in-diff
 
 ## Installation
 
+<!-- 
 You can install `syntCF` from CRAN:
 ```{r, echo=TRUE, eval=FALSE}
 install.packages("syntCF")
 ```
-
+ -->
+ 
 To install the development version of the `syntCF` package, you need to install the `remotes` package then the `syntCF` package.
 
 ```{r, echo=TRUE, eval=FALSE}
@@ -65,7 +67,7 @@ remotes::install_github("athammad/syntCF")
 
 ## Vignettes
 
-After installing the package you can view vignettes by typing `browseVignettes("syntCF")` in your R session. Or you can check this document where you will find an example with simulated data and method references.
+After installing the package you can view vignettes by typing `browseVignettes("syntCF")` in your R session. Or you can check this [document](https://github.com/athammad/syntCF/doc/syntCF_vignette.html) where you will find an example with simulated data and method references.
 
 
 ## Getting Help or Reporting an Issue
@@ -74,8 +76,7 @@ To report bugs/issues/feature requests, please file an [issue](https://github.co
 
 
 ## Next Steps and TO DO list
-- [ ] Include ensembles of caret models with `caretStack` from `caretEnsemble`
-- [ ] Include the `pinball loss` metric used to assess the accuracy of a quantile prediction.
+- [ ] Include ensembles of caret models with `caretStack` from `caretEnsemble`.
 
 ## References
 

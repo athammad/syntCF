@@ -87,5 +87,5 @@ To report bugs/issues/feature requests, please file an [issue](https://github.co
 - [Hammad, A. T., Falchetta, G., & Wirawan, I. B. M. (2021). Back to the fields? Increased agricultural land greenness after a COVID-19 lockdown. Environmental Research Communications, 3(5), 051007.](https://iopscience.iop.org/article/10.1088/2515-7620/abffa4)
 - [Wright, M. N. & Ziegler, A. (2017) ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Software 77:1-17.](https://doi.org/10.18637/jss.v077.i01)
 - [Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American statistical Association, 102(477), 359-378.](https://viterbi-web.usc.edu/~shaddin/cs699fa17/docs/GR07.pdf)
-
+- [Kuhn, M. (2008). Caret package. Journal of Statistical Software, 28(5)](https://www.jstatsoft.org/article/view/v028i05)
 

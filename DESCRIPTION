@@ -1,11 +1,30 @@
 Package: SyntCF
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Synthetic Counterfactual for Program and Policy Evaluation based on Machine Learning
+Version: 0.0.0.9000
+Author: Ahmed T. Hammad [aut, cre]
+Maintainer: The package maintainer <ahmed.t.hammad@gmail.com>
+Description: The SyntCF package provides a set of tools to estimate the effect of a 
+    program or a policy using a robust time series synthetic counterfactual approach
+    coupled with the double difference estimator within a Machine Learning framework.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    data.table,
+    caret,
+    caretEnsemble,
+    ranger,
+    jtools,
+    MLmetrics,
+    lubridate,
+    crayon,
+    ggplot2,
+    scoringutils
+URL: https://github.com/athammad/syntCF
+BugReports: https://github.com/athammad/syntCF/issues
+RoxygenNote: 7.1.2
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr

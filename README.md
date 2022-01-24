@@ -8,7 +8,7 @@
 
 <!-- badges: start -->
 [![img](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/8b2ebdc9756819625a56f7a426c29f99b777ab1d/doc/state-badges.md)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-GPL%303.0-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 [![R build status](https://github.com/bcgov/bcmaps/workflows/R-CMD-check/badge.svg)](https://github.com/bcgov/bcmaps/actions)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/bcmaps)](https://cran.r-project.org/package=bcmaps) [![CRAN Downloads](https://cranlogs.r-pkg.org/badges/bcmaps?color=brightgreen)](https://CRAN.R-project.org/package=bcmaps) 
 <!-- badges: end -->
@@ -19,29 +19,36 @@
 
 `syntCF`is an [R](https://www.r-project.org) package that provides a set of tools to estimate the effect of a program or a policy using a robust time series synthetic counterfactual approach coupled with the double difference estimator within a Machine Learning framework. The package is inspired by the methods proposed in following contributions:
 
-
 - [ ] [Grange, S. K., Carslaw, D. C., Lewis, A. C., Boleti, E., & Hueglin, C. (2018)](https://acp.copernicus.org/articles/18/6223/2018/)
 - [ ] [Petetin, H., Bowdalo, D., Soret, A., Guevara, M., Jorba, O., Serradell, K., & Pérez García-Pando, C. (2020)](https://acp.copernicus.org/articles/20/11119/2020/#abstract)
 - [ ] [Granella F., Reis L. A., Bosetti V. & Tavoni M. (2020)](https://iopscience.iop.org/article/10.1088/1748-9326/abd3d2)
 - [ ] [Hammad, A. T., Falchetta, G., & Wirawan, I. B. M. (2021)](https://iopscience.iop.org/article/10.1088/2515-7620/abffa4)
 
-The library encapsulates different ML algorithms, favoring quantile models to account for uncertainty in the predicted counterfactual time seires.
-Classic ML metrics such as RMSE,MAPE and R2, are acompagnied with additional metrics specifically designed to evaluate the goodness of the prediction intervals based on the work of [Gneiting, T., & Raftery, A. E. (2007)](https://viterbi-web.usc.edu/~shaddin/cs699fa17/docs/GR07.pdf).
 
-The final effect estimation is based on a difference-in-difference (DID) to account for any systematic error in the chosen model.
+The library uses a modified version of the robust random forest algorithm designed to take time dependency of the data into account trough block bootstrapping as developed in the library [rangerts](https://github.com/hyanworkspace/rangerts). To account to uncertainty in the predicted counterfactual time series, the library uses quantile regression forests [(Meinshausen, 2006)](https://www.jmlr.org/papers/volume7/meinshausen06a/meinshausen06a.pdf).
 
-The library is built around `Caret` and `CaretEsamble` to provide the user with a wide variety of algorithms and speeding up training time. 
+Classic ML metrics such as RMSE,MAPE and R2, are accompanied with additional metrics specifically designed to evaluate the goodness of the prediction intervals based on the work of [Gneiting, T., & Raftery, A. E. (2007)](https://viterbi-web.usc.edu/~shaddin/cs699fa17/docs/GR07.pdf).
+
+The final effect estimation is based on a difference-in-difference (DID) to account for any systematic error in the trained model.
+
+The library is built around `caret` and `ranger` to provide the user with a wide variety of options and speeding up training time. 
 
 ## Features
-**Training & Testing**
+**Train, Test & Evaluate in one go**
+
+Use `syntCFtrain()` and `syntCFmetrics()` to quickly train quantile Random forests with block bootstrapping and compute several evaluation metrics (RMSPE, MAPE,R2) including scoring rules metrics (interval score,sharpness, underprediction, overprediction).
 
 **Estimation**
 
-**Stacking**
+Estimate the effect of the treatment with `syntCFest()` using difference-in-difference (DID) to account for any systematic error in the trained model.
 
 **Plotting**
 
-For a worked example please refer to the R package documentation where you will find examples and method reference.
+`syntCFplot()` creates beautiful and easily customizable `ggplot2` plot to visualize to visually compare the factual and the counterfactual time series.
+
+<img src="finalPlot.png" width="600"  align="center"/>
+
+
 ## Installation
 
 You can install `syntCF` from CRAN:
@@ -56,48 +63,27 @@ install.packages("remotes")
 remotes::install_github("athammad/syntCF")
 ```
 
-## Usage
+## Vignettes
 
-To see the layers that are available, run the `available_layers()` function:
-```{r, echo=FALSE, warning=FALSE}
-library(bcmaps)
-```
+After installing the package you can view vignettes by typing `browseVignettes("syntCF")` in your R session. Or you can check this document where you will find an example with simulated data and method references.
 
-```{r, eval=FALSE}
-library(bcmaps)
-available_layers()
-```
-
-Most layers are accessible by a shortcut function by the same name as the object. 
-Then you can use the data as you would any `sf` or `Spatial` object. The first time
-you run try to access a layer, you will be prompted for permission to download that layer
-to your hard drive. Subsequently that layer is available locally for easy future access. For example:
-
-```{r}
-library(sf)
-bc <- bc_bound()
-plot(st_geometry(bc))
-```
-
-### Vignettes
-
-After installing the package you can view vignettes by typing `browseVignettes("syntCF")` in your R session.
 
 ## Getting Help or Reporting an Issue
 
 To report bugs/issues/feature requests, please file an [issue](https://github.com/athammad/syntCF/issues/).
 
 
-## Licence
+## Next Steps and TO DO list
+- [ ] Include ensembles of caret models with `caretStack` from `caretEnsemble`
+- [ ] Include the `pinball loss` metric used to assess the accuracy of a quantile prediction.
 
-    # Copyright 2022 Province of British Columbia
-    # 
-    # Licensed under the Apache License, Version 2.0 (the "License");
-    # you may not use this file except in compliance with the License.
-    # You may obtain a copy of the License at
-    # 
-    # http://www.apache.org/licenses/LICENSE-2.0
-    # 
-    # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
-    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    # See the License for the specific language governing permissions and limitations under the License.
+## References
+
+- [Grange, S. K., Carslaw, D. C., Lewis, A. C., Boleti, E., & Hueglin, C. (2018). Random forest meteorological normalisation models for Swiss PM 10 trend analysis. Atmospheric Chemistry and Physics, 18(9), 6223-6239.](https://acp.copernicus.org/articles/18/6223/2018/)
+- [Petetin, H., Bowdalo, D., Soret, A., Guevara, M., Jorba, O., Serradell, K., & Pérez García-Pando, C. (2020). Meteorology-normalized impact of the COVID-19 lockdown upon NO 2 pollution in Spain. Atmospheric Chemistry and Physics, 20(18), 11119-11141.](https://acp.copernicus.org/articles/20/11119/2020/#abstract)
+- [Granella, F., Reis, L. A., Bosetti, V., & Tavoni, M. (2021). COVID-19 lockdown only partially alleviates health impacts of air pollution in Northern Italy. Environmental Research Letters, 16(3), 035012.](https://iopscience.iop.org/article/10.1088/1748-9326/abd3d2)
+- [Hammad, A. T., Falchetta, G., & Wirawan, I. B. M. (2021). Back to the fields? Increased agricultural land greenness after a COVID-19 lockdown. Environmental Research Communications, 3(5), 051007.](https://iopscience.iop.org/article/10.1088/2515-7620/abffa4)
+- [Wright, M. N. & Ziegler, A. (2017) ranger: A fast implementation of random forests for high dimensional data in C++ and R. J Stat Software 77:1-17.](https://doi.org/10.18637/jss.v077.i01)
+- [Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation. Journal of the American statistical Association, 102(477), 359-378.](https://viterbi-web.usc.edu/~shaddin/cs699fa17/docs/GR07.pdf)
+
+

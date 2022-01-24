@@ -3,3 +3,7 @@
 .RData
 .Ruserdata
 logoSetUp
+myfolder
+inst/doc
+/doc/
+/Meta/

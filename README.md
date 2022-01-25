@@ -17,7 +17,7 @@
 
 ## Overview
 
-`syntCF`is an [R](https://www.r-project.org) package that provides a set of tools to estimate the effect of a program or a policy using a robust time series synthetic counterfactual approach coupled with the double difference estimator within a Machine Learning framework. The package is inspired by the methods proposed in following contributions:
+`syntCF` is an [R](https://www.r-project.org) package that provides a set of tools to estimate the effect of a program or a policy using a robust time series synthetic counterfactual approach coupled with the double difference estimator within a Machine Learning framework. The package is inspired by the methods proposed in following contributions:
 
 - [ ] [Grange, S. K., Carslaw, D. C., Lewis, A. C., Boleti, E., & Hueglin, C. (2018)](https://acp.copernicus.org/articles/18/6223/2018/)
 - [ ] [Petetin, H., Bowdalo, D., Soret, A., Guevara, M., Jorba, O., Serradell, K., & Pérez García-Pando, C. (2020)](https://acp.copernicus.org/articles/20/11119/2020/#abstract)

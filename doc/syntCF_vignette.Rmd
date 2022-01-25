@@ -7,11 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-the `syntCF` package provides a set of tools to estimate the effect of a program or a policy using a robust synthetic counterfactual approach. This vignette is designed to give a quick introduction to the methodological background and an hands-on tutorial. For a more in depth discussion, the interested reader is referred to the `References` section.
+the `syntCF` package, provides a set of tools to estimate the effect of a program or a policy using a robust synthetic counterfactual approach. This vignette is designed to give a quick introduction to the methodological background and an hands-on tutorial. For a more in depth discussion, the interested reader is referred to the `References` section.
 
 ## Background
 
-The idea is to combine the well known double difference estimator from the econometric toolkit for program and policy evaluation and a Machine Learning (ML) framework to estimate the effect of a program or policy over time as the difference between the factual or observed time series and a synthetic counterfactual time series. By doing so, we try to answer the question: "what would have happened if a given program or policy had never took place?"
+The idea is to combine the well-known double difference estimator from the econometric toolkit for program and policy evaluation, and a Machine Learning (ML) framework to estimate the effect of a program or policy over time as the difference between the factual or observed time series and a synthetic counterfactual time series. By doing so, we try to answer the question: "what would have happened if a given program or policy had never took place?"
 
 The steps that we are going to take can be summarized as follow:
 
@@ -31,16 +31,22 @@ where $y$ is outcome of interest , $ρ$ is the value predicted by the ML model, 
 Finally, an important aspect to consider is that the identification strategy assumes that the covariates used throughout the aforementioned steps, are not themselves affected by the program or policy of interest and that the underlying relationships between them remain unchanged over time.
 <!-- Hence the identification strategy is based on the difference between the prediction error before and during the treatment period. -->
 
+The algorithm used in the library is a modified version of the classic Random Forest algorithm but with tweak to take time dependency of the data into account. More specifically the algorithm replace the standard resampling procedure, with a block bootstrapping used during the period of tree growing (for more detail you can check the github repository of [rangets](https://github.com/hyanworkspace/rangerts)).
+
 ## Usage
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
 )
+
+
 ```
-First we load the library. Automatically several other packages are loaded such as `data.table` and `caret`.
-```{r setup}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+First we load the libraries we need.
+
+```{r setup,warning = FALSE, message = FALSE}
 library(SyntCF)
 library(data.table)
 ```
@@ -71,7 +77,7 @@ data[Dates%between%c("2019-12-29", "2020-12-29"),treatment:=1]
 ```
 
 Let's give a quick look at our dataset.
-```{r plotTS,fig.align = 'center'}
+```{r plotTS, fig.align='center',fig.width = 14, fig.height = 9, out.width = "588"}
 plot.ts(data)
 ```
 
@@ -85,7 +91,7 @@ To enhance the accuracy of the model and to account for trends and seasonality, 
                         p.start="2019-12-29",
                         p.end="2020-12-29",
                         testingPeriod=365,
-                        tuneLength=3,
+                        tuneLength=10,
                         verboseIter = F)
 ```
 
@@ -93,12 +99,17 @@ To enhance the accuracy of the model and to account for trends and seasonality, 
 #Time ellapsed
 trainModel$Model$times$everything
 ```
+We have not print any training log, but we can see that there are additional tuned parameters (`bootstrap.ts`, `block.size`,`by.end`).
+```{r params}
+#Time ellapsed
+trainModel$Model$bestTune[1,]
+```
+
 
 Note that you can customized how the training process using any of the argument allowed in `train` and `trainControl` as defined in `caret`.
 
 
-Compute evaluation metrics to measure regression performance.
-
+Now let's compute evaluation metrics to measure regression performance.
 Alongside the classic evaluation metrics (RMSPE, MAPE,R2), the library incorporates a more sophisticated measure of performance of a distribution prediction that comes from the family of scoring rules. Briefly, a scoring rule function $S(F, Y)$ is a measure of accuracy of a distribution prediction $F$ given the observed outcome $Y$. here we use a proper scoring rule designed to score quantile predictions from the package `scoringutils`.
 
 $S = (u - l) + 2/\alpha * (l - Y) * 1(Y < l) + 2/\alpha * (Y - u) * 1(Y > u)$
@@ -113,13 +124,12 @@ Where $Y$ is the true value of the outcome of interest, $l$ and $u$ denotes resp
 ```
 Finally estimate the effect of the treatment and plot the results.
 
-
 ```{r estimates}
 estEffect<-syntCFest(modelEval)
 estEffect$Estimates
 ```
 
-```{r finalPlot,fig.align = 'center'}
+```{r finalPlot, fig.align='center',fig.width = 14, fig.height = 9, out.width = "588"}
 #plot
 syntCFplot(estEffect)
 ```
